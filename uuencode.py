@@ -1,3 +1,4 @@
+from itertools import zip_longest
 
 def dec_to_bin(number):
     """ take int number as the argument, and return
@@ -41,6 +42,12 @@ def add32(the_list):
         string += new_char
     return string
 
+def grouper(iterable, n, fillvalue=None):
+    """Collect data into fixed-length chunks or blocks
+    # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx"""
+    args = [iter(iterable)] * n
+    return zip_longest(*args, fillvalue=fillvalue)
+
 def split_lines(string):
     """ takes a str string as the argument, and splits it
         into a list of strings, each 45 characters in length """
@@ -60,21 +67,44 @@ def split_lines(string):
     return line_list
 
 def uuencode(string):
-    three_chars = ''
-    for i in range(3):
-        three_chars += string[i]
+    """ take a list of strings as the argument, and return a list
+        of uuencoded strings """
+    encoded_output = []
+    three_char_lines = []
+    encoded_string = ''
 
-    binary_string = make_bin_string(three_chars)
-    binary_string_split = split_into_6(binary_string)
-    print(add32(binary_string_split))
-    
+    for char in string:
+        three_char_blocks = grouper(char, 3, fillvalue='0')
+        three_char_lines.append(three_char_blocks)
+
+    for three_char_line in three_char_lines:
+        for three_char_block in three_char_line:
+            # three_char_block will be = ['char1', 'char2', 'char3']
+            # the last three_char_block will be = ['char1', 'char2', '0']
+            # if there are an uneven amount of 3 character blocks
+            three_char_string = ''.join(three_char_block)
+            binary_string = make_bin_string(three_char_string)
+            binary_string_split = split_into_6(binary_string)
+            encoded_char_block = add32(binary_string_split)
+            encoded_string += encoded_char_block
+
+    # create the length value for the beginning of each line 
+    #for line in string:
+        #length_value = chr(len(line) + 32)
+
+    # break the encoded string into a list of 60 characters each
+    substrings = [encoded_string[x:x+60] for x in
+                  range(0, len(encoded_string), 60)]
+
+    for i in range(len(substrings)):
+        print(substrings[i])
     
 my_input = 'I feel very strongly about you doing duty. Would you give \
 me a little more documentation about your reading in French? \
-I am glad you are happy — but I never believe much in happiness. \
+I am glad you are happy - but I never believe much in happiness. \
 I never believe in misery either. Those are things you see on the \
 stage or the screen or the printed pages, they never really happen \
 to you in life.'
 
 formatted_input = split_lines(my_input)
-uuencode(formatted_input[0])
+uuencode(formatted_input)
