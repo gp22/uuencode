@@ -66,14 +66,34 @@ def split_lines(string):
     line_list.append(new_line)
     return line_list
 
-def uuencode(string):
+def insert_length_value(list_to_encode, reference_list):
+    """ take two lists of strings as arguments: the first is the uuencoded 
+        string to add to, the second is the unencoded string to use as the
+        reference. Return a list with a uuencoded length value at the
+        beginning of each string """
+    encoded_output = list_to_encode[:]
+    # create the length value for each line. Add it
+    # to the beginning of each line of encoded_output
+    for i in range(len(reference_list)):
+        length_value = chr(len(reference_list[i]) + 32)
+        encoded_output[i] = length_value + encoded_output[i]
+    return encoded_output
+
+def break_into_lines(the_string):
+    """ take str the_string as the argument, and break it into a
+        list of 60 characters each """
+    processed_list = [the_string[x:x+60] for x in
+                        range(0, len(the_string), 60)]
+    return processed_list
+    
+def uuencode(list_of_strings):
     """ take a list of strings as the argument, and return a list
         of uuencoded strings """
     encoded_output = []
     three_char_lines = []
     encoded_string = ''
 
-    for char in string:
+    for char in list_of_strings:
         three_char_blocks = grouper(char, 3, fillvalue='0')
         three_char_lines.append(three_char_blocks)
 
@@ -87,17 +107,12 @@ def uuencode(string):
             binary_string_split = split_into_6(binary_string)
             encoded_char_block = add32(binary_string_split)
             encoded_string += encoded_char_block
-
-    # create the length value for the beginning of each line 
-    #for line in string:
-        #length_value = chr(len(line) + 32)
-
+            
     # break the encoded string into a list of 60 characters each
-    substrings = [encoded_string[x:x+60] for x in
-                  range(0, len(encoded_string), 60)]
-
-    for i in range(len(substrings)):
-        print(substrings[i])
+    processed_list = break_into_lines(encoded_string)
+    # insert the length value to the beginning of each line in the list
+    processed_list = insert_length_value(processed_list, list_of_strings)
+    return processed_list
     
 my_input = 'I feel very strongly about you doing duty. Would you give \
 me a little more documentation about your reading in French? \
@@ -107,4 +122,5 @@ stage or the screen or the printed pages, they never really happen \
 to you in life.'
 
 formatted_input = split_lines(my_input)
-uuencode(formatted_input)
+encoded_input = uuencode(formatted_input)
+print(encoded_input)
