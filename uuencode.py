@@ -89,7 +89,6 @@ def break_into_lines(the_string):
 def uuencode(list_of_strings):
     """ take a list of strings as the argument, and return a list
         of uuencoded strings """
-    encoded_output = []
     three_char_lines = []
     encoded_string = ''
 
