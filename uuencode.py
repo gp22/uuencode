@@ -1,4 +1,5 @@
 from itertools import zip_longest
+import sys
 
 def dec_to_bin(number):
     """ take int number as the argument, and return
@@ -120,6 +121,28 @@ I never believe in misery either. Those are things you see on the \
 stage or the screen or the printed pages, they never really happen \
 to you in life.'
 
-formatted_input = split_lines(my_input)
-encoded_input = uuencode(formatted_input)
-print(encoded_input)
+def main():
+    formatted_input = split_lines(my_input)
+    encoded_input = uuencode(formatted_input)
+
+    # get mode for the file (644 for windows, 744 for all others)
+    if sys.platform.startswith('win32'):
+        mode = 644
+    else:
+        mode = 744
+
+    # get output file name
+    out_file = 'file.txt'
+    
+    # print header: begin <mode> <file><newline>
+    print('begin {} {}'.format(mode, out_file))
+    print(encoded_input)
+    
+    # print footer:
+    # `<newline>
+    # end<newline>
+    footer = '`\nend\n'
+    print(footer)
+
+if __name__ == '__main__':
+    main()
